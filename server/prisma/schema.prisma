@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -7,42 +7,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum Role {
-  ADMIN
-  SURVEILLANT
-  TECHNICIAN
-}
-
-enum Shift {
-  MORNING
-  AFTERNOON
-  NIGHT
-}
-
-enum TaskType {
-  ABSENCE
-  RESTAURANT
-  WEEKEND
-}
-
-enum RestaurantType {
-  BREAKFAST
-  LUNCH
-  DINNER
-}
-
-enum ReclamationStatus {
-  PENDING
-  IN_PROGRESS
-  DONE
-}
-
 model User {
   id              String        @id @default(uuid())
   email           String        @unique
   password        String
   name            String
-  role            Role          @default(SURVEILLANT)
+  role            String        @default("SURVEILLANT") // ADMIN, SURVEILLANT, TECHNICIAN
   
   assignments     Assignment[]
   permanences     Permanence[]
@@ -66,8 +36,8 @@ model Assignment {
   userId          String
   dortoir         Dortoir?      @relation(fields: [dortoirId], references: [id])
   dortoirId       String?
-  type            TaskType
-  shift           Shift?
+  type            String        // ABSENCE, RESTAURANT, WEEKEND
+  shift           String?       // MORNING, AFTERNOON, NIGHT
   date            DateTime
   
   absences        Absence[]
@@ -91,7 +61,7 @@ model RestaurantLog {
   id              String        @id @default(uuid())
   assignment      Assignment    @relation(fields: [assignmentId], references: [id])
   assignmentId    String
-  type            RestaurantType
+  type            String        // BREAKFAST, LUNCH, DINNER
   studentCount    Int
   observations    String?
   date            DateTime      @default(now())
@@ -101,7 +71,7 @@ model Reclamation {
   id              String            @id @default(uuid())
   title           String
   description     String
-  status          ReclamationStatus @default(PENDING)
+  status          String            @default("PENDING") // PENDING, IN_PROGRESS, DONE
   
   createdBy       User              @relation("CreatedBy", fields: [createdById], references: [id])
   createdById     String
@@ -116,7 +86,7 @@ model Permanence {
   id              String        @id @default(uuid())
   user            User          @relation(fields: [userId], references: [id])
   userId          String
-  shift           Shift
+  shift           String        // MORNING, AFTERNOON, NIGHT
   date            DateTime
   createdAt       DateTime      @default(now())
 }
