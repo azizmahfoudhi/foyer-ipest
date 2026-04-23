@@ -41,11 +41,13 @@ const login = async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
+      console.log(`Login Failed: User not found with email ${email}`);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(`Login Failed: Password mismatch for ${email}`);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
