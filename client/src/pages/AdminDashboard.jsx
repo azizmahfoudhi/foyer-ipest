@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Users, ClipboardCheck, Wrench, TrendingUp } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ users: 0, absences: 0, restaurant: 0, pendingReclamations: 0 });
 
@@ -11,7 +13,7 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users/stats');
+      const res = await axios.get(`${API_BASE_URL}/users/stats`);
       setStats(res.data);
     } catch (err) {
       console.error(err);

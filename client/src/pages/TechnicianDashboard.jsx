@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Wrench, CheckCircle, Clock } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 const TechnicianDashboard = () => {
   const { user } = useAuth();
   const [reclamations, setReclamations] = useState([]);
@@ -13,7 +15,7 @@ const TechnicianDashboard = () => {
 
   const fetchReclamations = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/reclamations');
+      const res = await axios.get(`${API_BASE_URL}/reclamations`);
       setReclamations(res.data);
     } catch (err) {
       console.error(err);
@@ -22,7 +24,7 @@ const TechnicianDashboard = () => {
 
   const handleUpdateStatus = async (id, status) => {
     try {
-      await axios.patch(`http://localhost:5000/api/reclamations/${id}`, { status, technicianId: user.id });
+      await axios.patch(`${API_BASE_URL}/reclamations/${id}`, { status, technicianId: user.id });
       fetchReclamations();
     } catch (err) {
       console.error(err);

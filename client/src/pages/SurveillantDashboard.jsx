@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { CheckCircle2, Circle } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 const SurveillantDashboard = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
@@ -16,7 +18,7 @@ const SurveillantDashboard = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/tasks/assignments?userId=${user.id}`);
+      const res = await axios.get(`${API_BASE_URL}/tasks/assignments?userId=${user.id}`);
       setTasks(res.data);
     } catch (err) {
       console.error(err);
@@ -33,12 +35,12 @@ const SurveillantDashboard = () => {
     e.preventDefault();
     try {
       if (selectedTask.type === 'ABSENCE' || selectedTask.type === 'WEEKEND') {
-        await axios.post('http://localhost:5000/api/tasks/absences', {
+        await axios.post(`${API_BASE_URL}/tasks/absences`, {
           assignmentId: selectedTask.id,
           ...formData
         });
       } else {
-        await axios.post('http://localhost:5000/api/tasks/restaurant', {
+        await axios.post(`${API_BASE_URL}/tasks/restaurant`, {
           assignmentId: selectedTask.id,
           ...formData
         });

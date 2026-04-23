@@ -3,6 +3,8 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/auth/me');
+      const res = await axios.get(`${API_BASE_URL}/auth/me`);
       setUser(res.data);
     } catch (err) {
       localStorage.removeItem('token');
@@ -30,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+    const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
     localStorage.setItem('token', res.data.token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
     setUser(res.data.user);
