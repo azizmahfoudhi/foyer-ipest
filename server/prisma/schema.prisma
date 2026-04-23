@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  SURVEILLANT
+  TECHNICIAN
+}
+
+enum Shift {
+  MORNING
+  AFTERNOON
+  NIGHT
+}
+
+enum TaskType {
+  ABSENCE
+  RESTAURANT
+  WEEKEND
+}
+
+enum RestaurantType {
+  BREAKFAST
+  LUNCH
+  DINNER
+}
+
+enum ReclamationStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id              String        @id @default(uuid())
+  email           String        @unique
+  password        String
+  name            String
+  role            Role          @default(SURVEILLANT)
+  
+  assignments     Assignment[]
+  permanences     Permanence[]
+  reclamationsCreated Reclamation[] @relation("CreatedBy")
+  reclamationsAssigned Reclamation[] @relation("AssignedTo")
+  activityLogs    ActivityLog[]
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Dortoir {
+  id              String        @id @default(uuid())
+  name            String        @unique // 1, 2, 3, 4, 5, 6, 7a, 7b, 8a, 8b
+  assignments     Assignment[]
+}
+
+model Assignment {
+  id              String        @id @default(uuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  dortoir         Dortoir?      @relation(fields: [dortoirId], references: [id])
+  dortoirId       String?
+  type            TaskType
+  shift           Shift?
+  date            DateTime
+  
+  absences        Absence[]
+  restaurantLogs  RestaurantLog[]
+  
+  completed       Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+}
+
+model Absence {
+  id              String        @id @default(uuid())
+  assignment      Assignment    @relation(fields: [assignmentId], references: [id])
+  assignmentId    String
+  studentCount    Int
+  absentCount     Int
+  observations    String?
+  date            DateTime      @default(now())
+}
+
+model RestaurantLog {
+  id              String        @id @default(uuid())
+  assignment      Assignment    @relation(fields: [assignmentId], references: [id])
+  assignmentId    String
+  type            RestaurantType
+  studentCount    Int
+  observations    String?
+  date            DateTime      @default(now())
+}
+
+model Reclamation {
+  id              String            @id @default(uuid())
+  title           String
+  description     String
+  status          ReclamationStatus @default(PENDING)
+  
+  createdBy       User              @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById     String
+  technician      User?             @relation("AssignedTo", fields: [technicianId], references: [id])
+  technicianId    String?
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Permanence {
+  id              String        @id @default(uuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  shift           Shift
+  date            DateTime
+  createdAt       DateTime      @default(now())
+}
+
+model ActivityLog {
+  id              String        @id @default(uuid())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  action          String
+  timestamp       DateTime      @default(now())
+}
