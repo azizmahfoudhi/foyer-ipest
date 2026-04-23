@@ -8,3 +8,6 @@ client/dist
 server/node_modules
 server/.env
 *.log
+*.db
+*.db-journal
+*.db-wal
